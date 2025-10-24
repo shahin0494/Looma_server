@@ -4,9 +4,9 @@ const jwtMiddleware = require("../middlewares/jwtMiddleware")
 const router = express.Router()
 
 // register
-router.post('/register', userController.registerController)
+router.post('/api/user/register', userController.registerController)
 
 // login
-router.post('/login', userController.loginController)
+router.post('/api/user/login', userController.loginController)
 
 module.exports = router
