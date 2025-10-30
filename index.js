@@ -11,7 +11,7 @@ const FreelanceServer = express()
 // enable cors protocol in server
 FreelanceServer.use(cors())
 FreelanceServer.use(express.json())
-FreelanceServer.use("/api/user", router)
+FreelanceServer.use(router)
 
 // port
 const PORT = 3001
