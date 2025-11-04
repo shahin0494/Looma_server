@@ -19,7 +19,7 @@ const jobSchema = new mongoose.Schema({
     },
     availability: {
         type: String,
-        required: true
+        default:""
     },
     location: {
         type: String,
@@ -35,20 +35,36 @@ const jobSchema = new mongoose.Schema({
     },
     technicalSkills:
     {
-        category: { type: String, required: true },
+        category: { type: String, default:"" },
         skills: { type: [String], default: [] }
     },
-    contact: {
-        email: { type: String, required: true },
-        phone: { type: String, required: true },
-        location: { type: String, required: true }
+    email:{
+        type: String,
+        required:true
     },
-    socialLinks: {
-        website: { type: String, default: "" },
-        github: { type: String, default: "" },
-        linkedin: { type: String, default: "" },
-        twitter: { type: String, default: "" },
-        portfolio: { type: String, default: "" }
+    phone:{
+        type: String,
+        required:true
+    },
+    website:{
+        type: String,
+        default:""
+    },
+    github:{
+        type: String,
+        default:""
+    },
+    linkedin:{
+        type: String,
+        default:""
+    },
+    twitter:{
+        type: String,
+        default:""
+    },
+    portfolio:{
+        type: String,
+        default:""
     },
     works: {
         type: Array,
