@@ -12,6 +12,7 @@ const FreelanceServer = express()
 FreelanceServer.use(cors())
 FreelanceServer.use(express.json())
 FreelanceServer.use(router)
+FreelanceServer.use("/uploads",express.static("./uploads"))
 
 // port
 const PORT = 3001

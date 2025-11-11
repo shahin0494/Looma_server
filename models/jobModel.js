@@ -19,7 +19,7 @@ const jobSchema = new mongoose.Schema({
     },
     availability: {
         type: String,
-        default:""
+        default: ""
     },
     location: {
         type: String,
@@ -33,38 +33,39 @@ const jobSchema = new mongoose.Schema({
         type: [String],
         required: true
     },
-    technicalSkills:
-    {
-        category: { type: String, default:"" },
-        skills: { type: [String], default: [] }
-    },
-    email:{
+    technicalSkills: [
+        {
+            category: { type: String, default: "" },
+            skills: { type: [String], default: [] }
+        }
+    ],
+    email: {
         type: String,
-        required:true
+        required: true
     },
-    phone:{
+    phone: {
         type: String,
-        required:true
+        required: true
     },
-    website:{
+    website: {
         type: String,
-        default:""
+        default: ""
     },
-    github:{
+    github: {
         type: String,
-        default:""
+        default: ""
     },
-    linkedin:{
+    linkedin: {
         type: String,
-        default:""
+        default: ""
     },
-    twitter:{
+    twitter: {
         type: String,
-        default:""
+        default: ""
     },
-    portfolio:{
+    portfolio: {
         type: String,
-        default:""
+        default: ""
     },
     works: {
         type: Array,
@@ -82,7 +83,11 @@ const jobSchema = new mongoose.Schema({
         type: Array,
         default: ""
     },
+    userMail: {
+        type: String,
+        required: true
+    },
 })
 
-const jobs = mongoose.model("jobs",jobSchema)
+const jobs = mongoose.model("jobs", jobSchema)
 module.exports = jobs

@@ -1,60 +1,70 @@
 const jobs = require("../models/jobModel")
 
+
+
+
+// add job
 exports.addJobController = async (req, res) => {
-    console.log("inside add job controller ");
-    const { username, jobTitle, specializations, fees, availability, location, summary, experience, technicalSkills, email,phone,website,github,linkedin,twitter,portfolio, works, status, profilePhoto, backgroundPhoto } = req.body
-    console.log(username, jobTitle, specializations, fees, availability, location, summary, experience, technicalSkills,email,phone,website,github,linkedin,twitter,portfolio, works, status, profilePhoto, backgroundPhoto);
+  try {
+    // 🧩 Extract the body
+    const data = req.body;
+
+    // 🧠 Parse JSON strings safely
+    data.specializations = JSON.parse(data.specializations || "[]");
+    data.experience = JSON.parse(data.experience || "[]");
+   data.technicalSkills = JSON.parse(data.technicalSkills || "[]");
+    // 🖼 Handle file uploads (if you’re storing filenames)
+    const files = req.files;
+    if (files?.profilePhoto) {
+      data.profilePhoto = files.profilePhoto.map((file) => file.filename);
+    }
+    if (files?.backgroundPhoto) {
+      data.backgroundPhoto = files.backgroundPhoto.map((file) => file.filename);
+    }
+    if (files?.works) {
+      data.works = files.works.map((file) => file.filename);
+    }
+
+    // 💾 Create and save
+    const newJob = new jobs(data);
+    await newJob.save();
+
+    res.status(200).json({ message: "Job added successfully", job: newJob });
+  } catch (err) {
+    console.error("❌ Error adding job:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+// get all jobs
+exports.getAllJobs= async (req,res)=>{
+    console.log("inside get all jobs controller");
+    const searchKey = req.query.search
+    const uEmail = req.payload.email
+    const query = {
+        jobTitle: { $regex: searchKey,$options:"i"},
+        email:{ $ne:uEmail}
+    }
     try {
-        const jobDetails = await jobs.findOne({ username, jobTitle })
-        if (jobDetails) {
-            res.status(409).json("job already exists please add another")
-        } else {
-            const newJob = new jobs({
-                username, jobTitle, specializations, fees, availability, location, summary, experience, technicalSkills, email,phone,website,github,linkedin,twitter,portfolio, works, status, profilePhoto, backgroundPhoto
-            })
-            await newJob.save()
-            res.status(200).json(newJob)
-        }
-    } catch (err) {
-        res.status(500).json(err)
+        const allJobs = await jobs.find(query)
+        res.status(200).json(allJobs)
+    } catch (error) {
+        res.status(500).json(error)
     }
 }
 
-// const jobs = require("../models/jobModel")
-
-// exports.addJobController = async (req, res) => {
-//     console.log("inside add job controller ");
-
-//     // 1. Get text data from req.body
-//     const { username, jobTitle, specializations, fees, availability, location, summary, experience, technicalSkills, contact, socialLinks, works, status } = req.body
-
-//     // 2. Get file data from req.files (populated by multer)
-//     // 'req.files' will contain objects for 'profilePhoto' and 'backgroundPhoto'
-//     // We just need to save the file paths
+// view single job
+exports.viewJobController = async (req,res)=>{
+    console.log("inside viewJobController");
+    const {id} = req.params
+    console.log(id);
+    try {
+        const viewJob = await jobs.findById({_id : id})
+        res.status(200).json(viewJob)
+    } catch (error) {
+        res.status(500).json(error)
+    }
     
-//     // Check if files exist and get their paths
-//     const profilePhotoPath = req.files.profilePhoto ? req.files.profilePhoto[0].path : ""
-//     const backgroundPhotoPath = req.files.backgroundPhoto ? req.files.backgroundPhoto[0].path : ""
-    
-//     // Log the text data (files will be logged by multer if setup)
-//     console.log(username, jobTitle, specializations, fees, availability, location, summary, experience, technicalSkills, contact, socialLinks, works, status);
+}
 
-//     try {
-//         const jobDetails = await jobs.findOne({ username, jobTitle })
-//         if (jobDetails) {
-//             res.status(409).json("job already exists please add another")
-//         } else {
-//             const newJob = new jobs({
-//                 username, jobTitle, specializations, fees, availability, location, summary, experience, technicalSkills, contact, socialLinks, works, status,
-//                 // 3. Save the file paths to the database
-//                 profilePhoto: [profilePhotoPath], // Save path in an array, as per your schema
-//                 backgroundPhoto: [backgroundPhotoPath] // Save path in an array, as per your schema
-//             })
-//             await newJob.save()
-//             res.status(200).json(newJob)
-//         }
-//     } catch (err) {
-//         console.error(err); // Always good to log the error
-//         res.status(500).json(err)
-//     }
-// }
