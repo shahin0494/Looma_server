@@ -1,19 +1,23 @@
 const jobs = require("../models/jobModel")
 
 
-
-
 // add job
 exports.addJobController = async (req, res) => {
   try {
-    // 🧩 Extract the body
     const data = req.body;
 
-    // 🧠 Parse JSON strings safely
+    // ✅ Extract user email from token payload
+    const userEmail = req.payload.email;
+
+    // ✅ Attach email to the job
+    data.email = userEmail;
+
+    // Parse fields safely
     data.specializations = JSON.parse(data.specializations || "[]");
     data.experience = JSON.parse(data.experience || "[]");
-   data.technicalSkills = JSON.parse(data.technicalSkills || "[]");
-    // 🖼 Handle file uploads (if you’re storing filenames)
+    data.technicalSkills = JSON.parse(data.technicalSkills || "[]");
+
+    // Handle file uploads
     const files = req.files;
     if (files?.profilePhoto) {
       data.profilePhoto = files.profilePhoto.map((file) => file.filename);
@@ -25,7 +29,7 @@ exports.addJobController = async (req, res) => {
       data.works = files.works.map((file) => file.filename);
     }
 
-    // 💾 Create and save
+    // Save job
     const newJob = new jobs(data);
     await newJob.save();
 
@@ -35,7 +39,6 @@ exports.addJobController = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
 
 // get all jobs
 exports.getAllJobs= async (req,res)=>{
@@ -68,3 +71,74 @@ exports.viewJobController = async (req,res)=>{
     
 }
 
+// get all user uploaded job
+exports.getAllUserUploadJobsController = async (req,res)=>{
+  console.log("inside getAllUserUploadJobsController");
+  const Uemail = req.payload.email
+  try {
+    const allUserJobs = await jobs.find({email:Uemail})
+    res.status(200).json(allUserJobs)
+  } catch (error) {
+    res.status(500).json(error)
+  }
+}
+
+// removing user uploaded job
+exports.deleteUserJobController = async (req, res) => {
+    console.log("inside delete user job controller");
+    // get book id
+    const { id } = req.params
+    console.log(id);
+    try {
+        await jobs.findByIdAndDelete({ _id: id })
+        res.status(200).json("deletion successfull")
+    } catch (err) {
+        res.status(500).json(err)
+    }
+}
+
+// get all user bought books
+exports.getAllUserBoughtJobsController = async (req,res)=>{
+  console.log("inside getAllUserBoughtBooks controller");
+  const email = req.payload.email
+  try {
+    const allUserBoughtJobs = await jobs.find({bought:email})
+     res.status(200).json(allUserBoughtJobs)
+  } catch (error) {
+     res.status(500).json(error)
+  }
+}
+
+
+
+// exports.addJobController = async (req, res) => {
+//   try {
+//     // 🧩 Extract the body
+//     const data = req.body;
+
+//     // 🧠 Parse JSON strings safely
+//     data.specializations = JSON.parse(data.specializations || "[]");
+//     data.experience = JSON.parse(data.experience || "[]");
+//    data.technicalSkills = JSON.parse(data.technicalSkills || "[]");
+//     // 🖼 Handle file uploads (if you’re storing filenames)
+//     const files = req.files;
+//     if (files?.profilePhoto) {
+//       data.profilePhoto = files.profilePhoto.map((file) => file.filename);
+//     }
+//     if (files?.backgroundPhoto) {
+//       data.backgroundPhoto = files.backgroundPhoto.map((file) => file.filename);
+//     }
+//     if (files?.works) {
+//       data.works = files.works.map((file) => file.filename);
+//     }
+
+//     // 💾 Create and save
+//     const newJob = new jobs(data);
+//     await newJob.save();
+
+//     res.status(200).json({ message: "Job added successfully", job: newJob });
+//   } catch (err) {
+//     console.error("❌ Error adding job:", err);
+//     res.status(500).json({ error: err.message });
+//   }
+// };

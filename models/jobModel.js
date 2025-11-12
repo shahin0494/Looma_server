@@ -86,7 +86,15 @@ const jobSchema = new mongoose.Schema({
     userMail: {
         type: String,
         required: true
+    },jobStatus: {
+        type: String,
+        default: "pending"
     },
+    bought: {
+        type: String,
+        default: ""
+    },
+
 })
 
 const jobs = mongoose.model("jobs", jobSchema)

@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema({
     enum: ["client", "freelancer", "admin"],
     default: "client"
   },
+  jobType:{
+    type: String,
+    default:""
+  },
   createdAt: {
     type: Date,
     default: Date.now

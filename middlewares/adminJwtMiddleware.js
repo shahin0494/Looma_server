@@ -1,4 +1,5 @@
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
+
 
 const jwtMiddleware = (req, res, next) => {
     console.log("inside jwt middleware");
@@ -11,13 +12,15 @@ const jwtMiddleware = (req, res, next) => {
             email: jwtResponse.userEmail,
             role: jwtResponse.role
         }
-        next()
+        // Check admin role
+        if (jwtResponse.role === "admin") {
+            next(); // ✅ Authorized admin
+        } else {
+            res.status(401).json("unauthorised user"); // ❌ Not admin
+        }
     } catch (err) {
         res.status(401).json("invalid token", err)
     }
 }
 
 module.exports = jwtMiddleware
-
-
-
