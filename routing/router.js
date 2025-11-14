@@ -45,4 +45,10 @@ router.get("/all-users",adminMiddleware,userController.getAllUserLIstsController
 // update admin profile
 router.put("/admin-profile/edit", adminMiddleware, multerConfig.single("profileImage"),userController.adminProfileEditController)
 
+// admin get all jobs
+router.get("/admin-all-jobs",adminMiddleware,jobController.getAllJobsAdminController)
+
+// admin approve job
+router.put("/admin/jobs/approve",adminMiddleware,jobController.updateJobStatusController)
+
 module.exports = router

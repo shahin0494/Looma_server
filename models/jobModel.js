@@ -86,7 +86,8 @@ const jobSchema = new mongoose.Schema({
     userMail: {
         type: String,
         required: true
-    },jobStatus: {
+    },
+    jobStatus: {
         type: String,
         default: "pending"
     },
