@@ -48,6 +48,34 @@ exports.loginController = async (req, res) => {
     }
 }
 
+// google login
+
+exports.googleLoginController = async (req, res) => {
+    console.log("Inside Google login API");
+    //console.log(req.body);
+    const { email, password, username, profile } = req.body
+    console.log(email, password, username, profile);
+
+    try {
+        const existingUser = await users.findOne({ email })
+        if (existingUser) {
+            // token
+            const token = jwt.sign({ userEmail: existingUser.email, role: existingUser.role }, process.env.JWTSECRET)
+            res.status(200).json({ user: existingUser, token })
+        } else {
+            const newUser = new users({
+                username, email, password, profile
+            })
+            await newUser.save()
+            // token
+            const token = jwt.sign({ userEmail: newUser.email }, process.env.JWTSECRET)
+            res.status(200).json({ user: newUser, token })
+        }
+
+    } catch (error) {
+        res.status(500).json(error)
+    }
+}
 
 // edit user profile
 exports.editUserProfileController = async (req, res) => {

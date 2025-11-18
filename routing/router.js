@@ -12,6 +12,9 @@ router.post('/register', userController.registerController)
 // login
 router.post('/login', userController.loginController)
 
+// Googlelogin
+router.post('/google-login', userController.googleLoginController)
+
 // add job
 router.post("/add-job", jwtMiddleware, multerConfig.fields([
     { name: 'profilePhoto', maxCount: 1 },
