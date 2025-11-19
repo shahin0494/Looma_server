@@ -40,6 +40,9 @@ router.delete("/user-jobs/:id/remove", jwtMiddleware, jobController.deleteUserJo
 // get all user bought jobs
 router.get("/user-bought-jobs",jwtMiddleware,jobController.getAllUserBoughtJobsController)
 
+// payment
+router.post("/make-payment", jwtMiddleware, jobController.makeJobPaymentController);
+
 // admin
 
 // get all users

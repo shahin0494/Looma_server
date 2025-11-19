@@ -1,4 +1,5 @@
 const jobs = require("../models/jobModel")
+const stripe = require("stripe")("sk_test_51SPbdm2M3fJPEa74ewqGHRPszGSUPF52DF6Sw846koIkhhpobpqhfs7MhApssC6a3iUAEyeFqfJ3x3RKxUWHYeYn00xoMho1EW")
 
 
 // add job
@@ -97,12 +98,12 @@ exports.deleteUserJobController = async (req, res) => {
   }
 }
 
-// get all user bought books
+// get all user bought jobs
 exports.getAllUserBoughtJobsController = async (req, res) => {
   console.log("inside getAllUserBoughtBooks controller");
-  const email = req.payload.email
+  const Uemail = req.payload.email
   try {
-    const allUserBoughtJobs = await jobs.find({ bought: email })
+    const allUserBoughtJobs = await jobs.find({ bought: Uemail })
     res.status(200).json(allUserBoughtJobs)
   } catch (error) {
     res.status(500).json(error)
@@ -123,13 +124,63 @@ exports.getAllJobsAdminController = async (req, res) => {
 // admin update status
 exports.updateJobStatusController = async (req, res) => {
   console.log("inside updateJobStatusController");
-  const { _id, username, jobTitle, specializations, fees, availability, location, summary, experience, technicalSkills, email, phone, website, github, linkedin, twitter, portfolio, works,status, profilePhoto, backgroundPhoto, userMail, bought } = req.body
+  const { _id, username, jobTitle, specializations, fees, availability, location, summary, experience, technicalSkills, email, phone, website, github, linkedin, twitter, portfolio, works, status, profilePhoto, backgroundPhoto, userMail, bought } = req.body
   try {
     const updateJob = await jobs.findByIdAndUpdate({ _id }, { username, jobTitle, specializations, fees, availability, location, summary, experience, technicalSkills, email, phone, website, github, linkedin, twitter, portfolio, works, status, profilePhoto, backgroundPhoto, userMail, jobStatus: "approved", bought }, { new: true })
     await updateJob.save()
     res.status(200).json(updateJob)
   } catch (error) {
     res.status(500).json(error)
+  }
+}
+
+
+
+// make payment
+exports.makeJobPaymentController = async (req, res) => {
+  console.log("inside makejobPaymentController");
+  const { _id, username, jobTitle, specializations, fees, availability, location, summary, experience, technicalSkills, phone, website, github, linkedin, twitter, portfolio, works, profilePhoto, backgroundPhoto, userMail } = req.body
+  const email = req.payload.email
+  try {
+    const updateJobDetails = await jobs.findByIdAndUpdate({ _id }, {
+      username, jobTitle, specializations, fees, availability, location, summary, experience, technicalSkills, email, phone, website, github, linkedin, twitter, portfolio, works, status: "sold", profilePhoto, backgroundPhoto, userMail, bought: email
+    }, { new: true })
+    console.log(updateJobDetails);
+    const cleanFees = Number(String(fees).replace(/[^\d.-]/g, ""));
+    // stripe checkout session
+    const line_items = [{
+      price_data: {
+        currency: "usd",
+        product_data: {
+          name: jobTitle,
+          description: `${jobTitle} | ${username}`,
+          images: profilePhoto,
+          metadata: {
+            jobId: String(_id),
+            seller: String(username || ""),
+            buyer: String(email || ""),
+            fees: String(cleanFees)
+          }
+        },
+       unit_amount: Math.round(cleanFees * 100)
+      },
+      quantity: 1
+    }]
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items,
+      success_url: "http://localhost:5173/payment-success",
+      cancel_url: "http://localhost:5173/payment-failed",
+      mode: 'payment',
+    });
+    console.log(session);
+    res.status(200).json({ checkoutSessionURL: session.url })
+
+  } catch (err) {
+    res.status(500).json(err)
+    console.log(err);
+    
   }
 }
 
