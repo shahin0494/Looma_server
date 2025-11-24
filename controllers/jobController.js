@@ -170,8 +170,10 @@ exports.makeJobPaymentController = async (req, res) => {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items,
-      success_url: "http://localhost:5173/payment-success",
-      cancel_url: "http://localhost:5173/payment-failed",
+      // success_url: "http://localhost:5173/payment-success",
+      // cancel_url: "http://localhost:5173/payment-failed",
+      success_url: "https://looma-frontend-uonz.vercel.app//payment-success",
+      cancel_url: "https://looma-frontend-uonz.vercel.app//payment-failed",
       mode: 'payment',
     });
     console.log(session);
